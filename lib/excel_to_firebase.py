@@ -1,5 +1,5 @@
-from lib.excel_sheet_manager import ExcelSheetManager
-from lib.firebase_manager import FirebaseManager
+from lib.managers.excel_sheet_manager import ExcelSheetManager
+from lib.managers.firebase_manager import FirebaseManager
 from lib.models.app_time import AppTime
 from lib.models.initiative import Initiative
 from lib.models.study_break import StudyBreak

@@ -19,9 +19,28 @@ class ExcelSheetManager:
         df = pd.read_excel(
             self.file_path,
             usecols=f"{start_col}:{end_col}",
-            nrows=end_row
+            skiprows=1,
+            nrows=end_row - 1
         )
-        return df.iloc[start_row - 1:end_row]
+        return df.iloc[start_row - 2:end_row - 1]
+
+    def read_range_with_column_number(self, start_col_idx, end_col_idx, start_row, end_row):
+        df = pd.read_excel(
+            self.file_path,
+            skiprows=1,
+            usecols=lambda col: True  # Load all columns; filter by index below
+        )
+        return df.iloc[start_row - 2:end_row - 1, start_col_idx:end_col_idx + 1]
+
+    def find_cell_position(self, target, sheet_name=0):
+        df = pd.read_excel(self.file_path, header=None, sheet_name=sheet_name)
+
+        for row_idx in range(df.shape[0]):
+            for col_idx in range(df.shape[1]):
+                if str(df.iat[row_idx, col_idx]).strip() == target:
+                    return row_idx, col_idx  # 0-based index
+
+        return None  # Not found
 
     def read_column_by_letter(self, col_letter):
         col_index = column_index_from_string(col_letter) - 1

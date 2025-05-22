@@ -1,20 +1,35 @@
 from lib.excel_sheet_manager import ExcelSheetManager
+from lib.firebase_manager import FirebaseManager
+from lib.master_handler import get_initiative_list_from_excel, upload_initiative_list_to_firebase
 
 
-def manage_excel():
-    path = r"S:\Data\temp test game json\xlsx test\DisciplinePlusData.xlsx"
-    manager = ExcelSheetManager(path)
 
-    manager.print_data()
+# Setting up
+file_path = r"S:\Data\temp test game json\xlsx test\DisciplinePlusData.xlsx"
+serviceAccountKeyPath = "discipline-plus-serviceAccountKey.json"
 
-    print("\n🔹 Range B1 to I8:")
-    print(manager.read_range("B", "I", 1, 8))
 
-    print("\n🔹 Column B (by letter):")
-    print(manager.read_column_by_letter("B"))
+day_list = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
-    # Optional: write to cell
-    # manager.write_cell("B27", "Hello World")
+def upload_excel_to_firebase():
+
+    for day in day_list:
+        initiative_list = get_initiative_list_from_excel(day, file_path=file_path)
+        upload_initiative_list_to_firebase(serviceAccountKeyPath=serviceAccountKeyPath, day=day,
+                                           data_list=initiative_list)
+
+def clean_firebase_data():
+
+    for day in day_list:
+        firebase = FirebaseManager(serviceAccountKeyPath)
+        firebase.clean_initiatives(day)
+
+
+def main():
+    clean_firebase_data()
+    upload_excel_to_firebase()
+
+
 
 
 
@@ -23,4 +38,5 @@ def manage_excel():
 
 
 if __name__ == '__main__':
-    manage_excel()
+    main()
+

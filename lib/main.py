@@ -27,6 +27,7 @@ def main():
 
     day_list = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
+
     clean_firebase_data(day_list=day_list,serviceAccountKeyPath=serviceAccountKeyPath)
     upload_excel_to_firebase(day_list=day_list,serviceAccountKeyPath=serviceAccountKeyPath,file_path=file_path)
 

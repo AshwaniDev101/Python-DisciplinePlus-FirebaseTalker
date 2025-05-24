@@ -34,36 +34,36 @@ class FirebaseManager:
 
     def clean_initiatives(self, day):
         """
-        Deletes *all* initiatives under a given day in the 'InitiativeList' subcollection.
+        Deletes *all* documents under 'InitiativeList' subcollection of the given day in 'WeekList',
+        without deleting the subcollection itself.
 
         :param day: Document ID under 'WeekList' (e.g., 'Friday')
         """
         root_collection = "WeekList"
         subcollection = "InitiativeList"
 
-        # Get all initiative documents under the day
-        initiatives_ref = self.db.collection(root_collection) \
-            .document(day) \
-            .collection(subcollection)
+        try:
+            initiatives_ref = self.db.collection(root_collection).document(day).collection(subcollection)
+            docs = initiatives_ref.stream()
 
-        docs = initiatives_ref.stream()
+            batch = self.db.batch()
+            count = 0
 
-        batch = self.db.batch()
-        count = 0
+            for doc in docs:
+                batch.delete(doc.reference)
+                count += 1
+                if count == 500:
+                    batch.commit()
+                    batch = self.db.batch()
+                    count = 0
 
-        for doc in docs:
-            batch.delete(doc.reference)
-            count += 1
-            # Firestore batch limit is 500 operations
-            if count == 500:
+            if count > 0:
                 batch.commit()
-                batch = self.db.batch()
-                count = 0
 
-        if count > 0:
-            batch.commit()
+            print(f"Deleted all initiatives from '{day}/{subcollection}'")
 
-        print(f"Deleted all initiatives from '{day}/{subcollection}'")
+        except Exception as e:
+            print(f"Failed to clean initiatives for {day}: {e}")
 
     def get_document(self, collection_name, document_id):
         doc_ref = self.db.collection(collection_name).document(document_id)

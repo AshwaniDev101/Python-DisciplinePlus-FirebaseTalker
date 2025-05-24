@@ -11,13 +11,23 @@ def get_initiative_list_from_excel(week_name:str,file_path:str):
     pos = manager.find_cell_position(week_name)
     df = manager.read_range_with_column_number(pos[1], pos[1]+2, 2, 15)
 
+
+    # Filter out NaN with is not string but a datatype of panda
+    df = df.dropna(subset=[df.columns[0]])
+
     initList = []
 
     for i, (title, duration, break_time) in enumerate(df.itertuples(index=False, name=None)):
+
         init = Initiative(title=title, completion_time=AppTime(0, duration),
                           study_break=StudyBreak(AppTime(0, break_time)), index=i)
         initList.append(init)
-        print(init.to_map())
+        print(f"this got added {init.to_map()}")
+
+
+
+
+
 
     return initList
 

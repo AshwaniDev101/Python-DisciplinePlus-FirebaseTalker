@@ -1,9 +1,6 @@
 from lib.managers.firebase_manager import FirebaseManager
 from lib.excel_to_firebase import get_initiative_list_from_excel, upload_initiative_list_to_firebase
-
-
-
-# Setting up
+from lib.ui.ApplicationUI import startApplicationUI
 
 
 def upload_excel_to_firebase(day_list,serviceAccountKeyPath,file_path):
@@ -22,6 +19,12 @@ def clean_firebase_data(day_list,serviceAccountKeyPath):
         firebase.clean_initiatives(day)
 
 
+
+
+
+
+
+
 def main():
 
     file_path = r"S:\Data\temp test game json\xlsx test\DisciplinePlusData.xlsx"
@@ -29,9 +32,10 @@ def main():
 
     day_list = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
+    # clean_firebase_data(day_list=day_list,serviceAccountKeyPath=serviceAccountKeyPath)
+    # upload_excel_to_firebase(day_list=day_list,serviceAccountKeyPath=serviceAccountKeyPath,file_path=file_path)
 
-    clean_firebase_data(day_list=day_list,serviceAccountKeyPath=serviceAccountKeyPath)
-    upload_excel_to_firebase(day_list=day_list,serviceAccountKeyPath=serviceAccountKeyPath,file_path=file_path)
+    startApplicationUI()
 
 
 

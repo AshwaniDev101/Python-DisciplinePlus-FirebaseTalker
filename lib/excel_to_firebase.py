@@ -9,7 +9,7 @@ def get_initiative_list_from_excel(week_name:str,file_path:str):
 
     manager = ExcelSheetManager(file_path)
     pos = manager.find_cell_position(week_name)
-    df = manager.read_range_with_column_number(pos[1], pos[1]+2, 2, 15)
+    df = manager.read_range_with_column_number(pos[1], pos[1]+2, 2, 30)
 
 
     # Filter out NaN with is not string but a datatype of panda
@@ -23,10 +23,6 @@ def get_initiative_list_from_excel(week_name:str,file_path:str):
                           study_break=StudyBreak(AppTime(0, break_time)), index=i)
         initList.append(init)
         print(f"this got added {init.to_map()}")
-
-
-
-
 
 
     return initList

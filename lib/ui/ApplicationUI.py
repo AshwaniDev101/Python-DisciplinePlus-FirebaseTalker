@@ -2,6 +2,7 @@ import tkinter as tk
 import os
 from lib.DisciplinePlusManager import DisciplinePlusManager
 from lib import logger  # NEW import
+from lib.managers.json.shared_preferences import SharedPreferences
 
 
 def startApplicationUI():
@@ -37,6 +38,44 @@ class ApplicationUI:
         tk.Button(button_frame, text="Upload Excel Table", command=self.upload).pack(side=tk.LEFT, expand=True, fill=tk.X)
         tk.Button(button_frame, text="Load From Firebase", command=self.download).pack(side=tk.LEFT, expand=True, fill=tk.X)
 
+
+        # === Excel File Picker with Label ===
+        file_picker_label = tk.Label(master, text="Select Excel file:")
+        file_picker_label.pack(anchor="w", padx=10, pady=(5, 0))
+
+        file_picker_frame = tk.Frame(master)
+        file_picker_frame.pack(fill=tk.X, padx=10, pady=(0, 10))
+
+        self.file_entry = tk.Entry(file_picker_frame, state='disabled', width=50)
+        self.file_entry.pack(side=tk.LEFT, fill=tk.X, expand=True)
+
+        default_file = SharedPreferences.get("excel_file_path")
+
+        self.file_entry.config(state='normal')
+        self.file_entry.delete(0, tk.END)
+        self.file_entry.insert(0, default_file)
+        self.file_entry.config(state='disabled')
+
+        browse_btn = tk.Button(file_picker_frame, text="Browse", command=self.browse_file)
+        browse_btn.pack(side=tk.LEFT, padx=5)
+        # ==========================================================================
+
+        # Number of row  ===============================================================
+        num_row_frame = tk.Frame(master)
+        num_row_frame.pack(fill=tk.X, padx=10, pady=(5, 10))
+
+        def only_numbers(char):
+            return char.isdigit()
+
+        vcmd = master.register(only_numbers)
+
+        self.num_row_entry = tk.Entry(num_row_frame, validate="key", validatecommand=(vcmd, '%S'), width=5)
+        self.num_row_entry.pack(side=tk.RIGHT, padx=(5, 0))  # Entry first (rightmost), with left padding
+
+        num_row_label = tk.Label(num_row_frame, text="Number of rows:")
+        num_row_label.pack(side=tk.RIGHT)
+        self.num_row_entry.insert(0, "30")
+
         # Console (uneditable Text widget)
         self.text = tk.Text(master, state='disabled', bg="#f0f0f0")
         self.text.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
@@ -55,6 +94,25 @@ class ApplicationUI:
         self.text.insert(tk.END, message + "\n")
         self.text.see(tk.END)
         self.text.config(state='disabled')
+
+
+    def browse_file(self):
+        from tkinter import filedialog
+        file_path = filedialog.askopenfilename(
+            title="Select an Excel file",
+            filetypes=[("Excel files", "*.xlsx")]
+        )
+        if file_path:
+            self.file_entry.config(state='normal')
+            self.file_entry.delete(0, tk.END)
+            self.file_entry.insert(0, file_path)
+            self.file_entry.config(state='disabled')
+
+            # Store the file path for future refrence
+            SharedPreferences.set("excel_file_path", file_path)
+
+            logger.log(f"File selected: {file_path}")
+
 
     # ========================  Buttons  ======================================
     def delete_firebase_data(self):

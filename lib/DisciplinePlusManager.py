@@ -1,16 +1,18 @@
 from lib.managers.excel.excel_sheet_manager import ExcelSheetManager
 from lib.managers.firebase.firebase_manager import FirebaseManager
+from lib.managers.json.shared_preferences import SharedPreferences
+
 
 class DisciplinePlusManager:
     def __init__(self):
 
         self.day_list = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
-        file_path = r"S:\Data\temp test game json\xlsx test\DisciplinePlusData.xlsx"
-        service_account_key_path = "managers/firebase/key/discipline-plus-serviceAccountKey.json"
+        # file_path = r"S:\Data\temp test game json\xlsx test\DisciplinePlusData.xlsx"
+        firebase_service_account_key_path = "managers/firebase/key/firebase-discipline-plus-serviceAccountKey.json"
 
-        self.firebase_manger = FirebaseManager(service_account_key_path)
-        self.excel_sheet_manager = ExcelSheetManager(file_path)
+        self.firebase_manger = FirebaseManager(firebase_service_account_key_path)
+        self.excel_sheet_manager = ExcelSheetManager(SharedPreferences.get("excel_file_path"))
 
     def upload_excel_to_firebase(self):
 

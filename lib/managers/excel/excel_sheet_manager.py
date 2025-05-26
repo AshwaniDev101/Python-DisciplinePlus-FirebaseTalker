@@ -6,6 +6,7 @@ from openpyxl import load_workbook
 from openpyxl.utils import column_index_from_string
 
 from lib import logger
+from lib.managers.json.shared_preferences import SharedPreferences
 from lib.models.app_time import AppTime
 from lib.models.initiative import Initiative
 from lib.models.study_break import StudyBreak
@@ -21,21 +22,22 @@ class ExcelSheetManager:
 
 
     # Public functions
-    def get_initiative_list_from_excel(self, week_name: str,):
+    def get_initiative_list_from_excel(self, week_name: str):
 
         pos = self._find_cell_position(week_name)
-        df = self._read_range_with_column_number(pos[1], pos[1] + 2, 2, 30)
+        df = self._read_range_with_column_number(pos[1], pos[1] + 2, 2, SharedPreferences.get('number_of_rows'))
 
         # Filter out NaN with is not string but a datatype of panda
         df = df.dropna(subset=[df.columns[0]])
 
         initList = []
 
+        logger.log(f"\n=== Excel file get [{week_name}] ===")
         for i, (title, duration, break_time) in enumerate(df.itertuples(index=False, name=None)):
-            init = Initiative(title=title, completion_time=AppTime(0, duration),
-                              study_break=StudyBreak(AppTime(0, break_time)), index=i)
+
+            init = Initiative(title=title, completion_time=AppTime(0, duration),study_break=StudyBreak(completion_time=AppTime(0, break_time)), index=i)
             initList.append(init)
-            logger.log(f"this got added {init.to_map()}")
+            logger.log(f"{init.completion_time} min,\tbrk: {init.study_break.completion_time} min, {init.title} ")
 
         return initList
 

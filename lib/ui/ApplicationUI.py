@@ -34,7 +34,7 @@ class ApplicationUI:
         button_frame = tk.Frame(master)
         button_frame.pack(fill=tk.X, side=tk.TOP, padx=5, pady=5)
 
-        tk.Button(button_frame, text="Delete Firebase", command=self.delete_firebase_data).pack(side=tk.LEFT, expand=True, fill=tk.X)
+        tk.Button(button_frame, text="Delete Firebase Data", command=self.delete_firebase_data).pack(side=tk.LEFT, expand=True, fill=tk.X)
         tk.Button(button_frame, text="Upload Excel Table", command=self.upload).pack(side=tk.LEFT, expand=True, fill=tk.X)
         tk.Button(button_frame, text="Load From Firebase", command=self.download).pack(side=tk.LEFT, expand=True, fill=tk.X)
 
@@ -70,15 +70,36 @@ class ApplicationUI:
         vcmd = master.register(only_numbers)
 
         self.num_row_entry = tk.Entry(num_row_frame, validate="key", validatecommand=(vcmd, '%S'), width=5)
-        self.num_row_entry.pack(side=tk.RIGHT, padx=(5, 0))  # Entry first (rightmost), with left padding
+        self.num_row_entry.pack(side=tk.RIGHT, padx=(5, 0))  # Entry first (rightmost)
+
+        def save_num_rows():
+            value = self.num_row_entry.get()
+            if value.isdigit():
+                SharedPreferences.set('number_of_rows', value)
+                logger.log(f"Saved number_of_rows = {value}")
+            else:
+                logger.log("Invalid number. Please enter digits only.")
+
+        save_btn = tk.Button(num_row_frame, text="update", command=save_num_rows)
+        save_btn.pack(side=tk.RIGHT, padx=(5, 5))
 
         num_row_label = tk.Label(num_row_frame, text="Number of rows:")
         num_row_label.pack(side=tk.RIGHT)
-        self.num_row_entry.insert(0, "30")
 
-        # Console (uneditable Text widget)
-        self.text = tk.Text(master, state='disabled', bg="#f0f0f0")
-        self.text.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        # Load initial value
+        self.num_row_entry.insert(0, SharedPreferences.get('number_of_rows'))
+
+        # Console frame with vertical scrollbar =========================================================================
+        console_frame = tk.Frame(master)
+        console_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+
+        scrollbar = tk.Scrollbar(console_frame)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+        self.text = tk.Text(console_frame, state='disabled', bg="#f0f0f0", yscrollcommand=scrollbar.set)
+        self.text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        scrollbar.config(command=self.text.yview)
 
         # Floating Clear Console Button
         clear_btn = tk.Button(master, text="Clean", command=self._clear_console, bg="#f0f0f0")

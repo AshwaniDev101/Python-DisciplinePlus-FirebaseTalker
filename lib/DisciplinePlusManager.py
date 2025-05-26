@@ -8,7 +8,6 @@ class DisciplinePlusManager:
 
         self.day_list = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
-        # file_path = r"S:\Data\temp test game json\xlsx test\DisciplinePlusData.xlsx"
         firebase_service_account_key_path = "managers/firebase/key/firebase-discipline-plus-serviceAccountKey.json"
 
         self.firebase_manger = FirebaseManager(firebase_service_account_key_path)
@@ -17,9 +16,10 @@ class DisciplinePlusManager:
     def upload_excel_to_firebase(self):
 
         for day in self.day_list:
+            # getting data from excel file
             initiative_list = self.excel_sheet_manager.get_initiative_list_from_excel(day)
-            for initiative in initiative_list:
-                print(initiative.title)
+
+            # uploading that data to firebase
             self.firebase_manger.upload_initiative_list_to_firebase(day=day, data_list=initiative_list)
 
     def clean_firebase_data(self):

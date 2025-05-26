@@ -1,10 +1,10 @@
 from lib.models.app_time import AppTime
 
 class StudyBreak:
-    def __init__(self, title='Break', completion_time=None):
+    def __init__(self, title='Break', completion_time = AppTime(0, 0)):
         # Ensure title is a string, not an AppTime
         self.title = title if isinstance(title, str) else 'Break'
-        self.completion_time = completion_time or AppTime(0, 5)
+        self.completion_time = completion_time
 
     def to_map(self):
         return {

@@ -10,22 +10,22 @@ class FirebaseManager:
         self.db = firestore.Client.from_service_account_json(service_account_path)
 
     # public functions
-    def upload_initiative_list_to_firebase(self, day: str, data_list):
+    def upload_initiative_list_to_firebase(self, weekday_name: str, initiative_list):
         # firebase = FirebaseManager(serviceAccountKeyPath)
-        self._batch_add_initiatives(day=day, initiatives=data_list)
+        self._batch_add_initiatives(weekday_name=weekday_name, initiatives_list=initiative_list)
 
-    def clean_initiatives(self, day):
+    def clean_initiatives(self, weekday_name):
         """
         Deletes *all* documents under 'InitiativeList' subcollection of the given day in 'WeekList',
         without deleting the subcollection itself.
 
-        :param day: Document ID under 'WeekList' (e.g., 'Friday')
+        :param weekday_name: Document ID under 'WeekList' (e.g., 'Friday')
         """
         root_collection = "WeekList"
         subcollection = "InitiativeList"
 
         try:
-            initiatives_ref = self.db.collection(root_collection).document(day).collection(subcollection)
+            initiatives_ref = self.db.collection(root_collection).document(weekday_name).collection(subcollection)
             docs = initiatives_ref.stream()
 
             batch = self.db.batch()
@@ -43,10 +43,10 @@ class FirebaseManager:
                 batch.commit()
 
 
-            logger.log(f"Deleted all initiatives from '{day}/{subcollection}'")
+            logger.log(f"Deleted all initiatives from '{weekday_name}/{subcollection}'")
 
         except Exception as e:
-            logger.log(f"Failed to clean initiatives for {day}: {e}")
+            logger.log(f"Failed to clean initiatives for {weekday_name}: {e}")
 
     # private functions
     def _set_document(self, collection_name, document_id, data):
@@ -54,19 +54,19 @@ class FirebaseManager:
         doc_ref.set(data)
         logger.log(f"Document '{document_id}' set in collection '{collection_name}'")
 
-    def _batch_add_initiatives(self, day, initiatives):
+    def _batch_add_initiatives(self, weekday_name, initiatives_list):
         """
         Adds multiple Initiative objects under a given day in the 'InitiativeList' subcollection.
 
-        :param day: Document ID under 'WeekList' (e.g., 'Friday')
-        :param initiatives: List of Initiative objects (must have .id and .to_map() methods)
+        :param weekday_name: Document ID under 'WeekList' (e.g., 'Friday')
+        :param initiatives_list: List of Initiative objects (must have .id and .to_map() methods)
         """
         batch = self.db.batch()
         root_collection = "WeekList"
 
-        for initiative in initiatives:
+        for initiative in initiatives_list:
             ref = self.db.collection(root_collection) \
-                .document(day) \
+                .document(weekday_name) \
                 .collection("InitiativeList") \
                 .document(initiative.id)
             data = initiative.to_map()
@@ -74,7 +74,7 @@ class FirebaseManager:
             batch.set(ref, data)
 
         batch.commit()
-        logger.log(f"Uploaded {len(initiatives)} initiatives to '{day}/InitiativeList'")
+        logger.log(f"Uploaded {len(initiatives_list)} initiatives to '{weekday_name}/InitiativeList'")
 
 
 

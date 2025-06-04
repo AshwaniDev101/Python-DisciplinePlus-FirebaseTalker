@@ -1,6 +1,6 @@
 import tkinter as tk
 import os
-from lib.DisciplinePlusManager import DisciplinePlusManager
+from lib.managers.DisciplinePlusManager import DisciplinePlusManager
 from lib import logger  # NEW import
 from lib.managers.json.shared_preferences import SharedPreferences
 

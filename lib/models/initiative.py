@@ -1,12 +1,12 @@
 from lib.models.app_time import AppTime
 from lib.models.study_break import StudyBreak
-from datetime import datetime
+from lib.utils.helper import generateReadableTimestamp
 
 
 class Initiative:
     def __init__(self, title, completion_time, index, id=None, dynamic_time=None,
                  is_complete=False, study_break=None):
-        self.id = id or self._generate_readable_id()
+        self.id = id or generateReadableTimestamp()
         self.title = title
         self.completion_time = completion_time
         self.dynamic_time = dynamic_time or AppTime(0, 0)
@@ -14,18 +14,7 @@ class Initiative:
         self.study_break = study_break or StudyBreak()
         self.index = index
 
-    @staticmethod
-    def _generate_readable_id():
-        now = datetime.now()
-        return f"{now.year}-{Initiative._two_digits(now.month)}-" \
-               f"{Initiative._two_digits(now.day)}_" \
-               f"{Initiative._two_digits(now.hour)}:" \
-               f"{Initiative._two_digits(now.minute)}." \
-               f"{now.microsecond // 1000}_{now.microsecond % 1000}"
 
-    @staticmethod
-    def _two_digits(n):
-        return str(n).zfill(2)
 
     def to_map(self):
         return {
